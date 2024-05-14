@@ -6,6 +6,8 @@ import SignUp from './components/auth/SignUp';
 import AuthDetails from './components/auth/AuthDetails';
 import { auth } from './components/firebase';
 import {useAuthState} from 'react-firebase-hooks/auth';
+import Cookies from 'js-cookie'
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, loading, error] = useAuthState(auth);

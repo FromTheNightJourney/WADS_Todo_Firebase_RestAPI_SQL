@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// Todo.jsx
+
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import TodoList from './TodoList';
 import FilterButtons from './FilterButtons';
@@ -6,11 +8,20 @@ import UserInfoPopup from './UserInfoPopup';
 import { addTodo, updateSearchTerm } from '../redux/actions';
 import { collection, addDoc } from 'firebase/firestore';
 import { auth, db } from '../components/firebase';
+import { setCookie, getCookie } from '../components/cookieHelper.js'; // Import cookie functions
 
 const Todo = () => {
   const [newTodoText, setNewTodoText] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Example: Fetch data from cookies when component mounts
+    const savedTodoText = getCookie('todoText');
+    if (savedTodoText) {
+      setNewTodoText(savedTodoText);
+    }
+  }, []);
 
   const handleAddTodo = async (text) => {
     const user = auth.currentUser;
@@ -26,12 +37,14 @@ const Todo = () => {
         console.log('Todo added with ID: ', docRef.id);
         // Clear the text bar
         setNewTodoText('');
+        // Example: Save data to cookies after adding todo
+        setCookie('todoText', '');
       } catch (error) {
         console.error('Error adding todo: ', error);
       }
     }
   };
-  
+
   return (
     <div className="max-w-4xl mx-auto sm:mt-8 p-4 bg-woodBrown rounded" style={{ border: '3px solid #deb887' }}>
       <h2 className='mt-3 mb-6 text-2xl font-bold text-center uppercase'>★ The ToDew List ★</h2>

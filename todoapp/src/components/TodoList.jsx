@@ -1,8 +1,11 @@
+// TodoList.jsx
+
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import TodoItem from './TodoItem';
-import { auth, db } from '../components/firebase'; // Assuming db is your Firestore instance
+import { auth, db } from '../components/firebase';
+import { getCookie, setCookie } from '../components/cookieHelper'; // Import cookie functions
 
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
@@ -25,14 +28,14 @@ const TodoList = () => {
     }
   }, []);
 
-  // filter  based on the current state
+  // filter based on the current state
   const filteredTodos = todos.filter(todo => {
     if (currentFilter === 'COMPLETED') {
       return todo.completed;
     } else if (currentFilter === 'INCOMPLETE') {
       return !todo.completed;
     } else {
-      return true; 
+      return true;
     }
   });
 
@@ -48,7 +51,9 @@ const TodoList = () => {
       try {
         const docRef = await addDoc(collection(db, 'todos'), todoData);
         const newTodo = { id: docRef.id, ...todoData };
-        setTodos([...todos, newTodo]); 
+        setTodos([...todos, newTodo]);
+        // Example: Save data to cookies after adding todo
+        setCookie('todos', JSON.stringify([...todos, newTodo]));
       } catch (error) {
         console.error('Error adding todo: ', error);
       }
@@ -67,6 +72,8 @@ const TodoList = () => {
     try {
       await deleteDoc(doc(db, 'todos', id));
       setTodos(todos.filter(todo => todo.id !== id));
+      // Example: Save data to cookies after deleting todo
+      setCookie('todos', JSON.stringify(todos.filter(todo => todo.id !== id)));
     } catch (error) {
       console.error('Error deleting todo: ', error);
     }
